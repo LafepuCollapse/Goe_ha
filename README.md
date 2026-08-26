@@ -7,7 +7,7 @@ Effective yield: about 1.5 kWh and 2...
 
 ## Panel
 
-![Panel Home Assistant](docs/images/panel.png)
+![Panel Home Assistant](docs/images/panel_ev.png)
 
 ---
 
@@ -77,7 +77,7 @@ Charging can also be manually forced, overriding the automatic charging conditio
            ▼
     Determine tariff
            │
-  ┌────────┴────────┐
+  ┌────────┴─────────┐
   │                  │
 Expensive tariff  Cheap tariff
   │                  │
