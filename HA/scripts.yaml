@@ -1,0 +1,27 @@
+go_e_przelacz_blokade_kabla:
+  sequence:
+  - target:
+      entity_id: select.go_echarger_322338_ust
+    data:
+      option: "{% if is_state('select.go_echarger_322338_ust', 'always_locked') %}\n
+        \ auto_unlock\n{% else %}\n  always_locked\n{% endif %}\n"
+    action: select.select_option
+  alias: Go-e przełącz blokadę kabla
+  mode: single
+  
+start_ladowania_ev:
+  sequence:
+  - alias: Start ładowania EV
+    sequence:
+    - action: select.select_option
+      target:
+        entity_id: select.go_echarger_322338_frc
+      data:
+        option: neutral
+    - action: select.select_option
+      target:
+        entity_id: select.go_echarger_322338_trx
+      data:
+        option: card_1
+  alias: start ładowania
+  description: ''
