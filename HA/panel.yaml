@@ -1,0 +1,88 @@
+- type: sections
+    max_columns: 4
+    title: EV
+    path: ev
+    icon: mdi:ev-plug-type2
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+          - type: entities
+            title: Sterowanie ładowaniem
+            entities:
+              - entity: input_boolean.laduj_tania_energia
+              - entity: input_boolean.laduj_nadwyzka_pv
+          - type: entities
+            title: Ładowanie auta
+            entities:
+              - entity: input_number.go_e_target_power
+          - show_name: true
+            show_icon: true
+            type: button
+            name: Start ładowania
+            icon: mdi:car-electric
+            tap_action:
+              action: perform-action
+              target:
+                entity_id: script.start_ladowania_ev
+              perform_action: script.turn_on
+            grid_options:
+              columns: 3
+              rows: 2
+            visibility:
+              - condition: state
+                entity: sensor.go_echarger_322338_frc
+                state_not: neutral
+              - condition: state
+                entity: binary_sensor.go_echarger_322338_car
+                state: 'on'
+            show_state: false
+          - show_name: true
+            show_icon: true
+            type: button
+            name: Stop ładowania
+            icon: mdi:stop-circle-outline
+            tap_action:
+              action: call-service
+              service: select.select_option
+              target:
+                entity_id: select.go_echarger_322338_frc
+              data:
+                option: dont_charge
+            grid_options:
+              columns: 3
+              rows: 2
+            visibility:
+              - condition: state
+                entity: sensor.go_echarger_322338_frc
+                state_not: dont_charge
+              - condition: state
+                entity: binary_sensor.go_echarger_322338_car
+                state: 'on'
+          - type: button
+            name: Kabel go-e
+            icon: mdi:lock
+            tap_action:
+              action: call-service
+              service: script.go_e_cable_lock_toggle
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.go_echarger_322338_nrg_5
+                name: L1
+                unit: A
+                min: 0
+                max: 16
+              - type: gauge
+                entity: sensor.go_echarger_322338_nrg_6
+                name: L2
+                unit: A
+                min: 0
+                max: 16
+              - type: gauge
+                entity: sensor.go_echarger_322338_nrg_7
+                name: L3
+                unit: A
+                min: 0
+                max: 16
