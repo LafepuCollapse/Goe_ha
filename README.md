@@ -69,8 +69,6 @@ Charging can also be manually forced, overriding the automatic charging conditio
 
 ## Charging Logic
 
-<div align="center">
-
 ```text
       Solar surplus
            │
@@ -88,8 +86,6 @@ Stop  < 700 W     Stop  < 150 W
            ▼
      EV charging
 ```
-
-</div>
 
 ---
 
@@ -129,8 +125,6 @@ This is particularly useful when the charger is made available to other users th
 
 The RFID workflow could be:
 
-<div align="center">
-
 ```text
       Vehicle connected
              │
@@ -151,8 +145,6 @@ The RFID workflow could be:
    Charging      Reject
 ```
 
-</div>
-
 ---
 
 ## Charging Session Accounting
@@ -167,7 +159,6 @@ The RFID workflow could be:
 
 Example:
 
-<div align="center">
 
 ```text
         Charging session
@@ -175,8 +166,6 @@ Example:
 ├── 1.8 kWh × 1.30 PLN = 2.34 PLN
 └── Electricity cost   = 4.86 PLN
 ```
-
-</div>
 
 ---
 
@@ -191,8 +180,6 @@ Example:
 - [ ] Provide a charging-session summary.
 
 The final price should be based on:
-
-<div align="center">
 
 ```text
          Energy consumed
@@ -210,20 +197,15 @@ Calculate actual electricity cost
  Final amount charged to user
 ```
 
-</div>
 
 Example:
 
-<div align="center">
-
 ```text
-Electricity cost    4.86 PLN
+Electricity cost     4.86 PLN
 Service fee          2.00 PLN
 ─────────────────────────────
 Final price          6.86 PLN
 ```
-
-</div>
 
 This approach allows the system to calculate the actual cost of each charging session, rather than using a fixed price per kWh.
 
