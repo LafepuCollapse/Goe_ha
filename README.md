@@ -1,15 +1,21 @@
 # Goe_ha
-Panel for Wallbox Goe witch PV
-Instalation PV 2x450W and HMS-800W and 2x340W and HM-800 evective get energy, about 1.5KW/h and 2 
+
+Panel for Wallbox Goe with PV.
+
+Installation: PV 2×450 W and HMS-800W, and 2×340 W and HM-800.
+Effective yield: about 1.5 kWh and 2...
 
 ## Panel
+
 ![Panel Home Assistant](docs/images/panel.png)
+
+---
 
 # Energy Measurement and EV Charging
 
 The system consists of two independent Tuya-based measurement installations located in the house.
 
-One Tuya plug measures the energy exported to the grid. Because the plug measures power in only one direction, exported energy is reported as a positive +kW value. It cannot distinguish the actual direction of current flow.
+One Tuya plug measures the energy exported to the grid. Because the plug measures power in only one direction, exported energy is reported as a positive `+kW` value. It cannot distinguish the actual direction of current flow.
 
 The second measurement point monitors the energy consumption of the individual household loads.
 
@@ -32,8 +38,8 @@ The system uses different charging thresholds depending on the current electrici
 
 When electricity is expensive:
 
-- Start charging: solar surplus ≥ 800 W
-- Stop charging: solar surplus < 700 W
+- **Start charging:** solar surplus ≥ 800 W
+- **Stop charging:** solar surplus < 700 W
 
 The 100 W hysteresis prevents the charger from repeatedly switching on and off when PV production fluctuates around the threshold.
 
@@ -41,8 +47,8 @@ The 100 W hysteresis prevents the charger from repeatedly switching on and off w
 
 During the low-tariff period:
 
-- Start charging: solar surplus ≥ 200 W
-- Stop charging: solar surplus < 150 W
+- **Start charging:** solar surplus ≥ 200 W
+- **Stop charging:** solar surplus < 150 W
 
 The lower threshold allows the system to use cheap grid electricity while still prioritizing available PV production.
 
@@ -51,7 +57,7 @@ The lower threshold allows the system to use cheap grid electricity while still 
 The system supports a dual-tariff electricity plan:
 
 | Period | Approx. price | Charging threshold |
-| --- | ---: | --- |
+|---|---:|---|
 | 13:00–15:00 | 0.60 PLN/kWh | Start ≥ 200 W / Stop < 150 W |
 | 22:00–06:00 | 0.60 PLN/kWh | Start ≥ 200 W / Stop < 150 W |
 | Weekends & public holidays | 0.60 PLN/kWh | Start ≥ 200 W / Stop < 150 W |
@@ -62,21 +68,29 @@ Charging can also be manually forced, overriding the automatic charging conditio
 ---
 
 ## Charging Logic
-                    Solar surplus
-                         │
-                         ▼
-                 Determine tariff
-                         │
-              ┌──────────┴──────────┐
-              │                     │
-         Expensive tariff       Cheap tariff
-              │                     │
-        Start ≥ 800 W          Start ≥ 200 W
-        Stop  < 700 W          Stop  < 150 W
-              │                     │
-              └──────────┬──────────┘
-                         ▼
-                   EV charging
+
+<div align="center">
+
+```text
+      Solar surplus
+           │
+           ▼
+    Determine tariff
+           │
+  ┌────────┴────────┐
+  │                  │
+Expensive tariff  Cheap tariff
+  │                  │
+Start ≥ 800 W     Start ≥ 200 W
+Stop  < 700 W     Stop  < 150 W
+  │                  │
+  └────────┬─────────┘
+           ▼
+     EV charging
+```
+
+</div>
+
 ---
 
 # TODO
@@ -115,23 +129,29 @@ This is particularly useful when the charger is made available to other users th
 
 The RFID workflow could be:
 
-Vehicle connected
-       |
-       v
-Detect cable / vehicle state
-       |
-       v
-Wait for RFID
-       |
-       v
-Identify user / vehicle
-       |
-   +---+---+
-   |       |
-Authorized Unknown
-   |       |
-   v       v
-Charging  Reject
+<div align="center">
+
+```text
+      Vehicle connected
+             │
+             ▼
+ Detect cable / vehicle state
+             │
+             ▼
+       Wait for RFID
+             │
+             ▼
+   Identify user / vehicle
+             │
+       ┌─────┴─────┐
+       │           │
+  Authorized     Unknown
+       │           │
+       ▼           ▼
+   Charging      Reject
+```
+
+</div>
 
 ---
 
@@ -147,10 +167,17 @@ Charging  Reject
 
 Example:
 
-Charging session
-+-- 4.2 kWh x 0.60 PLN = 2.52 PLN
-+-- 1.8 kWh x 1.30 PLN = 2.34 PLN
-+-- Electricity cost = 4.86 PLN
+<div align="center">
+
+```text
+        Charging session
+├── 4.2 kWh × 0.60 PLN = 2.52 PLN
+├── 1.8 kWh × 1.30 PLN = 2.34 PLN
+└── Electricity cost   = 4.86 PLN
+```
+
+</div>
+
 ---
 
 ## Paid Charging / PlugHome
@@ -161,30 +188,42 @@ Charging session
 - [ ] Calculate the final amount charged to the user.
 - [ ] Associate payments with the RFID user/vehicle.
 - [ ] Store charging history for billing purposes.
-- [ ] Provide a charging-session summary. 
+- [ ] Provide a charging-session summary.
 
 The final price should be based on:
 
-Energy consumed
-       |
-       v
+<div align="center">
+
+```text
+         Energy consumed
+                │
+                ▼
 Determine tariff for each period
-       |
-       v
+                │
+                ▼
 Calculate actual electricity cost
-       |
-       v
-Add service fee / commission
-       |
-       v
-Final amount charged to user
+                │
+                ▼
+ Add service fee / commission
+                │
+                ▼
+ Final amount charged to user
+```
+
+</div>
 
 Example:
 
+<div align="center">
+
+```text
 Electricity cost    4.86 PLN
-Service fee         2.00 PLN
----------------------------
-Final price         6.86 PLN
+Service fee          2.00 PLN
+─────────────────────────────
+Final price          6.86 PLN
+```
+
+</div>
 
 This approach allows the system to calculate the actual cost of each charging session, rather than using a fixed price per kWh.
 
