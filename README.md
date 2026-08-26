@@ -116,22 +116,22 @@ This is particularly useful when the charger is made available to other users th
 The RFID workflow could be:
 
 Vehicle connected
-       │
-       ▼
+       |
+       v
 Detect cable / vehicle state
-       │
-       ▼
+       |
+       v
 Wait for RFID
-       │
-       ▼
+       |
+       v
 Identify user / vehicle
-       │
-   ┌───┴────┐
-   │        │
-Authorized  Unknown
-   │        │
-   ▼        ▼
-Charging   Reject
+       |
+   +---+---+
+   |       |
+Authorized Unknown
+   |       |
+   v       v
+Charging  Reject
 
 ---
 
@@ -148,9 +148,9 @@ Charging   Reject
 Example:
 
 Charging session
-├── 4.2 kWh × 0.60 PLN = 2.52 PLN
-├── 1.8 kWh × 1.30 PLN = 2.34 PLN
-└── Electricity cost = 4.86 PLN
++-- 4.2 kWh x 0.60 PLN = 2.52 PLN
++-- 1.8 kWh x 1.30 PLN = 2.34 PLN
++-- Electricity cost = 4.86 PLN
 ---
 
 ## Paid Charging / PlugHome
@@ -166,25 +166,25 @@ Charging session
 The final price should be based on:
 
 Energy consumed
-        │
-        ▼
+       |
+       v
 Determine tariff for each period
-        │
-        ▼
+       |
+       v
 Calculate actual electricity cost
-        │
-        ▼
+       |
+       v
 Add service fee / commission
-        │
-        ▼
+       |
+       v
 Final amount charged to user
 
 Example:
 
-Electricity cost     4.86 PLN
-Service fee          2.00 PLN
-----------------------------
-Final price          6.86 PLN
+Electricity cost    4.86 PLN
+Service fee         2.00 PLN
+---------------------------
+Final price         6.86 PLN
 
 This approach allows the system to calculate the actual cost of each charging session, rather than using a fixed price per kWh.
 
