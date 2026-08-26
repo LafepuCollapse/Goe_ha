@@ -161,7 +161,7 @@ Charging session
 - [ ] Calculate the final amount charged to the user.
 - [ ] Associate payments with the RFID user/vehicle.
 - [ ] Store charging history for billing purposes.
-- [ ] Provide a charging-session summary.
+- [ ] Provide a charging-session summary. 
 
 The final price should be based on:
 
