@@ -1,0 +1,43 @@
+template:
+  - sensor:
+      - name: "Go-e naładowano kW"
+        unique_id: go_e_energy_kw
+        unit_of_measurement: "kW"
+        state: "{{ states('sensor.go_echarger_322338_wh') | float(0) / 1000 | round(1) }}"
+
+      - name: "Łączna moc"
+        unique_id: all_power
+        unit_of_measurement: "W"
+        device_class: power
+        state: >
+          {{
+            (
+              states('sensor.go_echarger_322338_nrg_12') | float(0) +
+              states('sensor.nous_a1_6_moc') | float(0) +
+              states('sensor.nous_a1_5_moc') | float(0)
+            )
+          }}
+      - name: "Łączna moc skorygowana o ładowanie EV"
+        unique_id: laczna_moc_skorygowana_ev
+        unit_of_measurement: "W"
+        state: >
+          {% set ev_w = (states('sensor.go_echarger_322338_nrg_12') | float(0)) %}
+          {{ (states('sensor.laczna_moc') | float(0)) - ev_w }}
+          
+input_boolean:
+  laduj_tania_energia:
+    name: "Ładuj gdy tania energia i min. 200W ze słońca"
+    icon: mdi:solar-power
+
+  laduj_nadwyzka_pv:
+    name: "Ładuj gdy oddaję min. 800W do sieci"
+    icon: mdi:transmission-tower-export
+
+input_number:
+  go_e_target_power:
+    name: Go-e moc ładowania
+    min: 1.4
+    max: 11
+    step: 0.1
+    unit_of_measurement: "kW"
+    icon: mdi:ev-station
