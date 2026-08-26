@@ -62,13 +62,21 @@ Charging can also be manually forced, overriding the automatic charging conditio
 ---
 
 ## Charging Logic
-
-text                     Solar surplus                          │                          ▼                  Determine tariff                          │               ┌──────────┴──────────┐               │                     │          Expensive tariff       Cheap tariff               │                     │         Start ≥ 800 W          Start ≥ 200 W         Stop  < 700 W          Stop  < 150 W               │                     │               └──────────┬──────────┘                          ▼                    EV charging 
-
-The hysteresis between the start and stop thresholds prevents unnecessary start/stop cycling when solar production fluctuates.
-
-The overall goal is to maximize the use of self-generated solar energy, while taking advantage of low-cost electricity when additional grid energy is required.
-
+                    Solar surplus
+                         │
+                         ▼
+                 Determine tariff
+                         │
+              ┌──────────┴──────────┐
+              │                     │
+         Expensive tariff       Cheap tariff
+              │                     │
+        Start ≥ 800 W          Start ≥ 200 W
+        Stop  < 700 W          Stop  < 150 W
+              │                     │
+              └──────────┬──────────┘
+                         ▼
+                   EV charging
 ---
 
 # TODO
@@ -107,8 +115,23 @@ This is particularly useful when the charger is made available to other users th
 
 The RFID workflow could be:
 
-text Vehicle connected        │        ▼ Detect cable / vehicle state        │        ▼ Wait for RFID        │        ▼ Identify user / vehicle        │    ┌───┴────┐    │        │ Authorized  Unknown    │        │    ▼        ▼ Charging   Reject 
-
+Vehicle connected
+       │
+       ▼
+Detect cable / vehicle state
+       │
+       ▼
+Wait for RFID
+       │
+       ▼
+Identify user / vehicle
+       │
+   ┌───┴────┐
+   │        │
+Authorized  Unknown
+   │        │
+   ▼        ▼
+Charging   Reject
 ---
 
 ## Charging Session Accounting
@@ -123,8 +146,10 @@ text Vehicle connected        │        ▼ Detect cable / vehicle state       
 
 Example:
 
-text Charging session ├── 4.2 kWh × 0.60 PLN = 2.52 PLN ├── 1.8 kWh × 1.30 PLN = 2.34 PLN └── Electricity cost = 4.86 PLN 
-
+Charging session
+├── 4.2 kWh × 0.60 PLN = 2.52 PLN
+├── 1.8 kWh × 1.30 PLN = 2.34 PLN
+└── Electricity cost = 4.86 PLN
 ---
 
 ## Paid Charging / PlugHome
@@ -139,12 +164,25 @@ text Charging session ├── 4.2 kWh × 0.60 PLN = 2.52 PLN ├── 1.8 kWh
 
 The final price should be based on:
 
-text Energy consumed         │         ▼ Determine tariff for each period         │         ▼ Calculate actual electricity cost         │         ▼ Add service fee / commission         │         ▼ Final amount charged to user 
-
+Energy consumed
+        │
+        ▼
+Determine tariff for each period
+        │
+        ▼
+Calculate actual electricity cost
+        │
+        ▼
+Add service fee / commission
+        │
+        ▼
+Final amount charged to user
 Example:
 
-text Electricity cost     4.86 PLN Service fee          2.00 PLN ---------------------------- Final price          6.86 PLN 
-
+Electricity cost     4.86 PLN
+Service fee          2.00 PLN
+----------------------------
+Final price          6.86 PLN
 This approach allows the system to calculate the actual cost of each charging session, rather than using a fixed price per kWh.
 
 ---
