@@ -51,7 +51,7 @@ The lower threshold allows the system to use cheap grid electricity while still 
 The system supports a dual-tariff electricity plan:
 
 | Period | Approx. price | Charging threshold |
-|---|---:|---:|
+| --- | ---: | --- |
 | 13:00–15:00 | 0.60 PLN/kWh | Start ≥ 200 W / Stop < 150 W |
 | 22:00–06:00 | 0.60 PLN/kWh | Start ≥ 200 W / Stop < 150 W |
 | Weekends & public holidays | 0.60 PLN/kWh | Start ≥ 200 W / Stop < 150 W |
@@ -132,6 +132,7 @@ Authorized  Unknown
    │        │
    ▼        ▼
 Charging   Reject
+
 ---
 
 ## Charging Session Accounting
@@ -177,12 +178,14 @@ Add service fee / commission
         │
         ▼
 Final amount charged to user
+
 Example:
 
 Electricity cost     4.86 PLN
 Service fee          2.00 PLN
 ----------------------------
 Final price          6.86 PLN
+
 This approach allows the system to calculate the actual cost of each charging session, rather than using a fixed price per kWh.
 
 ---
