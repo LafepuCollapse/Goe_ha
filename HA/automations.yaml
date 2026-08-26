@@ -1,0 +1,341 @@
+- id: '1735000001'
+  alias: Go-e regulacja mocy ładowania
+  description: ''
+  mode: restart
+  trigger:
+  - platform: state
+    entity_id: input_number.go_e_target_power
+  condition: []
+  action:
+  - variables:
+      power: '{{ states(''input_number.go_e_target_power'') | float }}'
+      amps: "{% if power < 4 %}\n  {% set a = (power * 1000 / 230) | round(0) %}\n{%
+        else %}\n  {% set a = (power * 1000 / 690) | round(0) %}\n{% endif %} {{ [[a,
+        6] | max, 16] | min }}\n"
+      phase: "{% if power < 4 %}\n  one_phase\n{% else %}\n  three_phases\n{% endif
+        %}\n"
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ power > 0 }}'
+      sequence:
+      - service: select.select_option
+        target:
+          entity_id: select.go_echarger_322338_frc
+        data:
+          option: neutral
+      - service: select.select_option
+        target:
+          entity_id: select.go_echarger_322338_trx
+        data:
+          option: card_1
+      - service: select.select_option
+        target:
+          entity_id: select.go_echarger_322338_psm
+        data:
+          option: '{{ phase }}'
+      - service: number.set_value
+        target:
+          entity_id: number.go_echarger_322338_amp
+        data:
+          value: '{{ amps }}'
+    default:
+    - service: select.select_option
+      target:
+        entity_id: select.go_echarger_322338_frc
+      data:
+        option: 'off'
+- id: '1735000002'
+  alias: EV - Start ładowania (tania taryfa/weekend + nadwyżka PV)
+  triggers:
+  - entity_id:
+    - sensor.laczna_moc_skorygowana_o_ladowanie_ev
+    below: -200
+    trigger: numeric_state
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 15
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.go_echarger_322338_car
+    state:
+    - 'on'
+  - condition: state
+    entity_id: input_boolean.laduj_tania_energia
+    state: 'on'
+  - condition: or
+    conditions:
+    - condition: and
+      conditions:
+      - condition: time
+        after: '13:00:00'
+        before: '15:00:00'
+      - condition: time
+        weekday:
+        - mon
+        - tue
+        - wed
+        - thu
+        - fri
+    - condition: time
+      weekday:
+      - sat
+      - sun
+  - condition: numeric_state
+    entity_id: sensor.go_echarger_322338_nrg_12
+    below: 0.1
+  actions:
+  - action: input_number.set_value
+    target:
+      entity_id: input_number.go_e_target_power
+    data:
+      value: 1.4
+  - action: script.turn_on
+    target:
+      entity_id: script.start_ladowania_ev
+  mode: single
+- id: '1735000003'
+  alias: EV - Stop ładowania (spadek produkcji PV)
+  triggers:
+  - entity_id:
+    - sensor.laczna_moc_skorygowana_o_ladowanie_ev
+    above: -100
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
+    trigger: numeric_state
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.go_echarger_322338_car
+    state:
+    - 'on'
+  - condition: numeric_state
+    entity_id: sensor.go_echarger_322338_nrg_12
+    above: 0.1
+  actions:
+  - action: select.select_option
+    target:
+      entity_id: select.go_echarger_322338_frc
+    data:
+      option: dont_charge
+  mode: single
+- id: '1735000004'
+  alias: EV - Start ładowania (droga energia, duża nadwyżka PV)
+  description: ''
+  triggers:
+  - entity_id:
+    - sensor.laczna_moc_skorygowana_o_ladowanie_ev
+    below: -800
+    trigger: numeric_state
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 15
+    enabled: true
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.go_echarger_322338_car
+    state:
+    - 'on'
+  - condition: state
+    entity_id: input_boolean.laduj_nadwyzka_pv
+    state: 'on'
+  - condition: numeric_state
+    entity_id: sensor.go_echarger_322338_nrg_12
+    below: 0.1
+  - condition: time
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  - condition: or
+    conditions:
+    - condition: time
+      after: 07:00:00
+      before: '13:00:00'
+    - condition: time
+      after: '15:00:00'
+      before: '20:00:00'
+  actions:
+  - action: input_number.set_value
+    target:
+      entity_id: input_number.go_e_target_power
+    data:
+      value: 1.4
+  - action: script.turn_on
+    target:
+      entity_id: script.start_ladowania_ev
+    data: {}
+  mode: single
+- id: '1735000005'
+  alias: EV - Stop ładowania (spadek nadwyżki PV poniżej 800W)
+  triggers:
+  - entity_id:
+    - sensor.laczna_moc_skorygowana_o_ladowanie_ev
+    above: -700
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
+    trigger: numeric_state
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.go_echarger_322338_car
+    state:
+    - 'on'
+  - condition: state
+    entity_id: input_boolean.laduj_nadwyzka_pv
+    state: 'on'
+  - condition: numeric_state
+    entity_id: sensor.go_echarger_322338_nrg_12
+    above: 0.1
+  - condition: time
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  - condition: or
+    conditions:
+    - condition: time
+      after: 07:00:00
+      before: '13:00:00'
+    - condition: time
+      after: '15:00:00'
+      before: '20:00:00'
+  actions:
+  - action: select.select_option
+    target:
+      entity_id: select.go_echarger_322338_frc
+    data:
+      option: dont_charge
+  - action: input_number.set_value
+    target:
+      entity_id: input_number.go_e_target_power
+    data:
+      value: 0
+  mode: single
+- id: '1735000006'
+  alias: EV - Stop ładowania (obowiązkowy stop o 20:00)
+  triggers:
+  - at: '20:00:00'
+    trigger: time
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.go_echarger_322338_car
+    state:
+    - 'on'
+  - condition: state
+    entity_id: input_boolean.laduj_nadwyzka_pv
+    state: 'on'
+  - condition: numeric_state
+    entity_id: sensor.go_echarger_322338_nrg_12
+    above: 0.1
+  actions:
+  - action: select.select_option
+    target:
+      entity_id: select.go_echarger_322338_frc
+    data:
+      option: dont_charge
+  mode: single
+- id: '1787655228422'
+  alias: Wyłącz 800W
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - input_boolean.laduj_nadwyzka_pv
+    to: 'off'
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.go_echarger_322338_car
+    state: 'on'
+  - condition: numeric_state
+    entity_id: sensor.go_echarger_322338_nrg_12
+    above: 0.1
+  - condition: time
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  - condition: or
+    conditions:
+    - condition: time
+      after: 06:00:00
+      before: '13:00:00'
+    - condition: time
+      after: '15:00:00'
+      before: '22:00:00'
+  actions:
+  - action: select.select_option
+    target:
+      entity_id: select.go_echarger_322338_frc
+    data:
+      option: dont_charge
+  mode: single
+- id: '1787655509878'
+  alias: EV - Stop ładowania (obowiązkowy stop 15:00 tania energia)
+  description: ''
+  triggers:
+  - trigger: time
+    at: '15:00:00'
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.go_echarger_322338_car
+    state: 'on'
+  - condition: numeric_state
+    entity_id: sensor.go_echarger_322338_nrg_12
+    above: 0.1
+  - condition: time
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  actions:
+  - action: select.select_option
+    target:
+      entity_id: select.go_echarger_322338_frc
+    data:
+      option: dont_charge
+  mode: single
+- id: '1787655544643'
+  alias: Wyłącz tania energia
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - input_boolean.laduj_tania_energia
+    to: 'off'
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.go_echarger_322338_car
+    state: 'on'
+  - condition: numeric_state
+    entity_id: sensor.go_echarger_322338_nrg_12
+    above: 0.1
+  - condition: time
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  - condition: time
+    after: '13:00:00'
+    before: '15:00:00'
+  actions:
+  - action: select.select_option
+    target:
+      entity_id: select.go_echarger_322338_frc
+    data:
+      option: dont_charge
+  mode: single
